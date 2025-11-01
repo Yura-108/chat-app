@@ -14,42 +14,30 @@ export default function Home() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
-    const handleSignin = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSignup = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (loading) return;
-
         setLoading(true);
 
-        if (!email || !password) {
-            toast("All fields are required!", {
-                style: {
-                    background: "#9810fa",
-                    color: "white",
-                },
-            });
-            setLoading(false);
-            return;
-        }
-
         try {
-            const res = await signIn("credentials", {
+            await axios.post("/api/auth/register", {
+                email, password
+            });
+
+            toast("Registration successful", {
+                style:{
+                    background:"#9810fa",
+                    color:"white"
+                }
+            });
+
+            const loginRes = await signIn("credentials", {
                 email, password, redirect: false
             });
 
-            if (res?.error) {
-                toast("Invalid Credentials", {
-                    style: {
-                        background: "#9810fa",
-                        color: "white",
-                    },
-                });
+            if (loginRes?.error) {
+                router.replace("/");
             } else {
-                toast("Signin successful", {
-                    style: {
-                        background: "#9810fa",
-                        color: "white",
-                    },
-                });
                 router.replace("/auth/setup-profile");
             }
         } catch (error) {
@@ -79,10 +67,10 @@ export default function Home() {
                     <AiFillMessage size={50} />
                 </div>
                 <h2 className="text-center text-3xl font-bold my-6 text-gray-300">
-                    Sign in to your account
+                    Create a new account
                 </h2>
-                <div className="py-10 px-6 rounded-lg shadow-md">
-                    <form onSubmit={handleSignin}>
+                <div className="py-10 px-6 rounded-lg  shadow-md">
+                    <form onSubmit={handleSignup}>
                         <input
                             type="email"
                             value={email}
@@ -103,7 +91,7 @@ export default function Home() {
                         <div className="my-3 text-center text-white">
                             <span>Already have an account?</span>
                             <Link href={"/"} className={"ml-2 text-purple-600"} >
-                                Sign up
+                                Sign in
                             </Link>
                         </div>
                     </form>
